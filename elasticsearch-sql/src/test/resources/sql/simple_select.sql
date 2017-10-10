@@ -1,1 +1,0 @@
-SELECT aaa FROM xxxx;
