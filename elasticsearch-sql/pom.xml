@@ -23,40 +23,10 @@
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>${antlr.version}</version>
-        <executions>
-          <execution>
-            <id>antlr4</id>
-            <goals>
-              <goal>antlr4</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <listener>true</listener>
-              <visitor>true</visitor>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>com.khubla.antlr</groupId>
         <artifactId>antlr4test-maven-plugin</artifactId>
-        <version>${antlr4test-maven-plugin.version}</version>
-        <configuration>
-          <verbose>false</verbose>
-          <showTree>false</showTree>
-          <packageName>me.yufan.elasticsearch.parser</packageName>
-          <entryPoint>prog</entryPoint>
-          <grammarName>ElasticSearch</grammarName>
-          <exampleFiles>src/test/resources/sql</exampleFiles>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -12,8 +12,8 @@
 
   <licenses>
     <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -25,21 +25,6 @@
   </scm>
 
   <developers>
-    <developer>
-      <id>ansj</id>
-      <name>ansj</name>
-      <email>ansj-sun@163.com</email>
-    </developer>
-    <developer>
-      <id>omershelef</id>
-      <name>Omer shelef</name>
-      <email>shlaflaf@gmail.com</email>
-    </developer>
-    <developer>
-      <id>eliranmoyal</id>
-      <name>Eliran Moyal</name>
-      <email>eliran.moyal1@gmail.com</email>
-    </developer>
     <developer>
       <id>syhily</id>
       <name>Yufan Chan</name>
@@ -68,6 +53,8 @@
     <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
     <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
     <antlr4test-maven-plugin.version>1.9</antlr4test-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
+    <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
   </properties>
 
   <modules>
@@ -121,84 +108,168 @@
   </dependencyManagement>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+            <encoding>UTF-8</encoding>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${maven-assembly-plugin.version}</version>
+          <configuration>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+          </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.github.wvengen</groupId>
+          <artifactId>proguard-maven-plugin</artifactId>
+          <version>${proguard-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>proguard</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <injar>${project.build.finalName}-jar-with-dependencies.jar</injar>
+            <outjar>${project.build.finalName}-small.jar</outjar>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <options>
+              <option>-dontobfuscate</option>
+              <option>-dontwarn com.google.**</option>
+            </options>
+            <libs>
+              <lib>${java.home}/lib/rt.jar</lib>
+            </libs>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <configuration>
+            <attach>true</attach>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <configuration>
+            <additionalparam>-Xdoclint:none</additionalparam>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.eluder.coveralls</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>${coveralls-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>${antlr.version}</version>
+          <executions>
+            <execution>
+              <id>antlr4</id>
+              <goals>
+                <goal>antlr4</goal>
+              </goals>
+              <phase>generate-sources</phase>
+              <configuration>
+                <listener>true</listener>
+                <visitor>true</visitor>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.khubla.antlr</groupId>
+          <artifactId>antlr4test-maven-plugin</artifactId>
+          <version>${antlr4test-maven-plugin.version}</version>
+          <configuration>
+            <verbose>false</verbose>
+            <showTree>false</showTree>
+            <packageName>me.yufan.elasticsearch.parser</packageName>
+            <entryPoint>prog</entryPoint>
+            <grammarName>ElasticSearch</grammarName>
+            <exampleFiles>src/test/resources/sql</exampleFiles>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
       </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven-assembly-plugin.version}</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <version>${proguard-maven-plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>proguard</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <injar>${project.build.finalName}-jar-with-dependencies.jar</injar>
-          <outjar>${project.build.finalName}-small.jar</outjar>
-          <outputDirectory>${project.build.directory}</outputDirectory>
-          <options>
-            <option>-dontobfuscate</option>
-            <option>-dontwarn com.google.**</option>
-          </options>
-          <libs>
-            <lib>${java.home}/lib/rt.jar</lib>
-          </libs>
-        </configuration>
-      </plugin>
-
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <version>${maven-source-plugin.version}</version>
-        <configuration>
-          <attach>true</attach>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>compile</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
-
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>${maven-javadoc-plugin.version}</version>
-        <configuration>
-          <additionalparam>-Xdoclint:none</additionalparam>
-        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.eluder.coveralls</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <version>${coveralls-maven-plugin.version}</version>
       </plugin>
     </plugins>
   </build>

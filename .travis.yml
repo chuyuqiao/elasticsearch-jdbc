@@ -11,15 +11,6 @@ notification:
     on_success: always
     on_failure: always
 
-before_install:
-  # update to java 8
-  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-5.6.2.deb
-  - sudo cp ./src/test/resources/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-  - sudo cat /etc/elasticsearch/elasticsearch.yml
-  - sudo java -version
-  - sudo service elasticsearch start
-  - sleep 30
-
 after_success:
   - bash .travis_after_success.sh
 

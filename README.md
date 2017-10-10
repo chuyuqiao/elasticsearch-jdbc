@@ -1,5 +1,9 @@
 # elasticsearch jdbc
 
+[![Build Status](https://api.travis-ci.org/syhily/elasticsearch-jdbc.svg?branch=master)](https://travis-ci.org/syhily/elasticsearch-jdbc/branches)
+[![Coverage Status](https://coveralls.io/repos/github/syhily/elasticsearch-jdbc/badge.svg?branch=master&service=github)](https://coveralls.io/github/syhily/elasticsearch-jdbc?branch=master)
+[![License](https://img.shields.io/:license-mit-brightgreen.svg)](https://opensource.org/licenses/MIT)
+
 ElasticSearch has a user friendly HTTP-JSON interface. But sometimes, a jdbc based SQL interface would make it easy for
 Java developers.
 
