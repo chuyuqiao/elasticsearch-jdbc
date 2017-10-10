@@ -28,9 +28,9 @@ selectOperation
     (
         limitClause
     )?
-	(
-		granularityClause
-	)?
+    (
+        granularityClause
+    )?
 ;
 
 deleteOperation
@@ -79,17 +79,17 @@ identity
 
 boolExpr
 :
-	LPAREN boolExpr RPAREN # lrExpr
-	| left = boolExpr EQ right = boolExpr # eqOpr
-	| left = boolExpr GT right = boolExpr # gtOpr
-	| left = boolExpr LT right = boolExpr # ltOpr
-	| left = boolExpr GTEQ right = boolExpr #gteqOpr
-	| left = boolExpr LTEQ right = boolExpr #lteqOpr
-	| left = boolExpr BANGEQ right = boolExpr # notEqOpr
-	| left = boolExpr AND right = boolExpr # andOpr
-	| left = boolExpr OR right = boolExpr # orOpr
-	| inExpr # inBooleanExpr
-	| name # nameOpr
+    LPAREN boolExpr RPAREN # lrExpr
+    | left = boolExpr EQ right = boolExpr # eqOpr
+    | left = boolExpr GT right = boolExpr # gtOpr
+    | left = boolExpr LT right = boolExpr # ltOpr
+    | left = boolExpr GTEQ right = boolExpr #gteqOpr
+    | left = boolExpr LTEQ right = boolExpr #lteqOpr
+    | left = boolExpr BANGEQ right = boolExpr # notEqOpr
+    | left = boolExpr AND right = boolExpr # andOpr
+    | left = boolExpr OR right = boolExpr # orOpr
+    | inExpr # inBooleanExpr
+    | name # nameOpr
 ;
 
 inExpr
@@ -125,9 +125,9 @@ inRightOprand
 
 const_literal
 :
-	INT # intLiteral
-	| FLOAT # floatLiteral
-	| STRING # stringLiteral
+    INT # intLiteral
+    | FLOAT # floatLiteral
+    | STRING # stringLiteral
 ;
 
 tableRef
@@ -145,60 +145,60 @@ whereClause
 
 groupClause
 :
-	GROUP BY name
-	(
-		COMMA name
-	)*
+    GROUP BY name
+    (
+        COMMA name
+    )*
 ;
 
 orderClause
 :
-	ORDER BY order
-	(
-		COMMA order
-	)*
+    ORDER BY order
+    (
+        COMMA order
+    )*
 ;
 
 order
 :
-	name type =
-	(
-		ASC
-		| DESC
-	)?
+    name type =
+    (
+        ASC
+        | DESC
+    )?
 ;
 
 limitClause
 :
-	LIMIT
-	(
-		offset = INT
-	)? resultCount = INT
+    LIMIT
+    (
+        offset = INT
+    )? resultCount = INT
 ;
 
 granularityClause
 :
-	BREAK BY granularityExpr
+    BREAK BY granularityExpr
 ;
 
 granularityExpr
 :
-	simple =
-	(
-		ALL
-		| NONE
-		| MINUTE
-		| FIFTEEN_MINUTE
-		| THIRTY_MINUTE
-		| HOUR
-		| DAY
-	) # simpleGran
-	|
-	(
-		left = INT TO
-	)? right = INT # durationGran
-	|
-	(
-		left = INT TO
-	) right = ID AS timeZone = ID # periodGran
+    simple =
+    (
+        ALL
+        | NONE
+        | MINUTE
+        | FIFTEEN_MINUTE
+        | THIRTY_MINUTE
+        | HOUR
+        | DAY
+    ) # simpleGran
+    |
+    (
+        left = INT TO
+    )? right = INT # durationGran
+    |
+    (
+        left = INT TO
+    ) right = ID AS timeZone = ID # periodGran
 ;

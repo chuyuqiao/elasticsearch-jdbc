@@ -39,13 +39,19 @@
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss SSS</maven.build.timestamp.format>
     <java.version>1.8</java.version>
 
-    <slf4j.version>1.7.25</slf4j.version>
     <elasticsearch.version>5.6.2</elasticsearch.version>
     <guava.version>23.0</guava.version>
-    <logback.version>1.2.3</logback.version>
+    <lombok.version>1.16.18</lombok.version>
     <antlr.version>4.7</antlr.version>
 
+    <logback.version>1.2.3</logback.version>
+    <slf4j.version>1.7.25</slf4j.version>
+    <log4j.version>1.2.17</log4j.version>
+    <log4j-core.version>2.9.1</log4j-core.version>
+    <commons-logging>1.2</commons-logging>
+
     <hamcrest.version>2.0.0.0</hamcrest.version>
+    <junit.version>4.12</junit.version>
 
     <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
     <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
@@ -60,17 +66,30 @@
   <modules>
     <module>elasticsearch-sql</module>
     <module>elasticsearch-driver</module>
+    <module>elasticsearch-common</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
+      <!-- Project dependencies -->
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
+        <groupId>me.yufan.elasticsearch</groupId>
+        <artifactId>elasticsearch-common</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
-      <!-- https://mvnrepository.com/artifact/org.antlr/antlr4-runtime -->
+      <dependency>
+        <groupId>me.yufan.elasticsearch</groupId>
+        <artifactId>elasticsearch-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>me.yufan.elasticsearch</groupId>
+        <artifactId>elasticsearch-driver</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
@@ -92,9 +111,65 @@
       </dependency>
 
       <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Log Dependencies -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${log4j.version}</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j-core.version}</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>${commons-logging}</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-access</artifactId>
         <version>${logback.version}</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
         <scope>provided</scope>
       </dependency>
 
@@ -114,8 +189,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
             <encoding>UTF-8</encoding>
           </configuration>
         </plugin>

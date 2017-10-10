@@ -9,17 +9,39 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>elasticsearch-sql</artifactId>
+  <artifactId>elasticsearch-common</artifactId>
 
   <dependencies>
     <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>me.yufan.elasticsearch</groupId>
-      <artifactId>elasticsearch-common</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-access</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -29,22 +51,10 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>java-hamcrest</artifactId>
     </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>com.khubla.antlr</groupId>
-        <artifactId>antlr4test-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>
