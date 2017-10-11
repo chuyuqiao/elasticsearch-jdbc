@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class IntPrimitiveOperand implements PrimitiveOperand {
+    private static final long serialVersionUID = 4811235592827844483L;
 
     private final String value;
 

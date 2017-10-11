@@ -61,7 +61,7 @@ name
     LPAREN name RPAREN # LRName
     | DISTINCT columnName = name #distinct
     | left = name op = (STAR | SLASH | MOD | PLUS | SUB) right = name # BinaryName
-    | ID LPAREN columnName = name RPAREN # AggregationName
+    | ID collection # AggregationName // Should this support avg(a, b, c) ?
     | identity # columnName
 ;
 
@@ -91,13 +91,18 @@ boolExpr
 
 inExpr
 :
-    left = identity in_or_not_in right = inRightOperandList
+    left = identity inToken right = inRightOperandList
 ;
 
-in_or_not_in
+inToken
 :
     IN # inOp
     | NOT IN # notInOp
+;
+
+collection
+:
+    LPAREN identity (COMMA identity)* RPAREN
 ;
 
 inRightOperandList
@@ -108,7 +113,7 @@ inRightOperandList
 
 inRightOperand
 :
-    const_literal # constLiteral
+    identity # constLiteral
     |left = inRightOperand op =
     (
         STAR
@@ -118,13 +123,6 @@ inRightOperand
         | MINUS
     )
     right = inRightOperand # arithmeticLiteral
-;
-
-const_literal
-:
-    INT # intLiteral
-    | FLOAT # floatLiteral
-    | STRING # stringLiteral
 ;
 
 tableRef

@@ -9,7 +9,10 @@ import me.yufan.elasticsearch.model.operands.LimitOperand;
 import me.yufan.elasticsearch.model.operands.OrderByOperand;
 import me.yufan.elasticsearch.model.operands.column.AliasOperand;
 import me.yufan.elasticsearch.model.operands.column.DistinctOperand;
+import me.yufan.elasticsearch.model.operands.primitive.*;
 import me.yufan.elasticsearch.model.operands.enums.BinaryToken;
+import me.yufan.elasticsearch.model.operands.function.FunctionFactory;
+import me.yufan.elasticsearch.model.operands.function.FunctionOperand;
 import me.yufan.elasticsearch.parser.ElasticSearchParser;
 import me.yufan.elasticsearch.parser.ElasticSearchParserVisitor;
 import me.yufan.elasticsearch.parser.ParserResult;
@@ -184,7 +187,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
             Operand binaryOp = BinaryToken.newInstance(ctx.op, leftOp, rightOp);
             parserHolder.push(binaryOp);
         } catch (ParseException e) {
-            log.error(e.getMessage() + e);
+            log.error(e.getMessage(), e);
             return ParserResult.failed(e.getMessage());
         }
         return ParserResult.success();
@@ -192,7 +195,21 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitAggregationName(ElasticSearchParser.AggregationNameContext ctx) {
-        return null;
+        String functionId = ctx.ID().getText();
+        ParserResult collection = visitCollection(ctx.collection());
+        if (!collection.isSuccess()) {
+            return collection;
+        } else {
+            List<PrimitiveOperand> operands = (List<PrimitiveOperand>) parserHolder.pop();
+            try {
+                FunctionOperand functionOperand = FunctionFactory.newInstance(functionId, operands);
+                parserHolder.push(functionOperand);
+            } catch (ParseException e) {
+                log.error(e.getMessage(), e);
+                return ParserResult.failed(e.getMessage());
+            }
+            return ParserResult.success();
+        }
     }
 
     @Override
@@ -221,22 +238,26 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitIdEle(ElasticSearchParser.IdEleContext ctx) {
-        return null;
+        parserHolder.push(new NameOperand(defaultTableName, ctx.ID().getText()));
+        return ParserResult.success();
     }
 
     @Override
     public ParserResult visitIntEle(ElasticSearchParser.IntEleContext ctx) {
-        return null;
+        parserHolder.push(new IntPrimitiveOperand(ctx.INT().getText()));
+        return ParserResult.success();
     }
 
     @Override
     public ParserResult visitFloatEle(ElasticSearchParser.FloatEleContext ctx) {
-        return null;
+        parserHolder.push(new FloatPrimitiveOperand(ctx.FLOAT().getText()));
+        return ParserResult.success();
     }
 
     @Override
     public ParserResult visitStringEle(ElasticSearchParser.StringEleContext ctx) {
-        return null;
+        parserHolder.push(new StringPrimitiveOperand(ctx.STRING().getText()));
+        return ParserResult.success();
     }
 
     @Override
@@ -315,6 +336,40 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
     }
 
     @Override
+    public ParserResult visitCollection(ElasticSearchParser.CollectionContext ctx) {
+        List<ElasticSearchParser.IdentityContext> identities = ctx.identity();
+        if (CollectionUtils.isNotEmpty(identities)) {
+            List<PrimitiveOperand> operands = new ArrayList<>(identities.size());
+            for (ElasticSearchParser.IdentityContext identity : identities) {
+                ParserResult result = visitIdentity(identity);
+                if (result.isSuccess()) {
+                    PrimitiveOperand op = (PrimitiveOperand) parserHolder.pop();
+                    operands.add(op);
+                } else {
+                    return result;
+                }
+            }
+            parserHolder.push(operands);
+            return ParserResult.success();
+        } else {
+            return ParserResult.failed("Identities shouldn't be empty");
+        }
+    }
+
+    private ParserResult visitIdentity(ElasticSearchParser.IdentityContext identity) {
+        if (identity instanceof ElasticSearchParser.IdEleContext) {
+            return visitIdEle((ElasticSearchParser.IdEleContext) identity);
+        } else if (identity instanceof ElasticSearchParser.IntEleContext) {
+            return visitIntEle((ElasticSearchParser.IntEleContext) identity);
+        } else if (identity instanceof ElasticSearchParser.FloatEleContext) {
+            return visitFloatEle((ElasticSearchParser.FloatEleContext) identity);
+        } else if (identity instanceof ElasticSearchParser.StringEleContext) {
+            return visitStringEle((ElasticSearchParser.StringEleContext) identity);
+        }
+        return ParserResult.failed("Unsupported identity type " + identity.getClass().getName());
+    }
+
+    @Override
     public ParserResult visitInRightOperandList(ElasticSearchParser.InRightOperandListContext ctx) {
         return null;
     }
@@ -326,21 +381,6 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitArithmeticLiteral(ElasticSearchParser.ArithmeticLiteralContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ParserResult visitIntLiteral(ElasticSearchParser.IntLiteralContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ParserResult visitFloatLiteral(ElasticSearchParser.FloatLiteralContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ParserResult visitStringLiteral(ElasticSearchParser.StringLiteralContext ctx) {
         return null;
     }
 

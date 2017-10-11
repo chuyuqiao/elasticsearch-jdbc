@@ -24,7 +24,7 @@ public enum BinaryToken {
 
     private int lexerIndex;
 
-    private BiFunction<Operand, Operand, Operand> biFunction;
+    private BiFunction<Operand, Operand, Operand> convert;
 
     public static Operand newInstance(Token typeToken, Operand left, Operand right) {
         // Lazy init map would be a good choice, any solution ?
@@ -39,6 +39,6 @@ public enum BinaryToken {
         if (binaryToken == null) {
             throw new ParseException("This token " + typeToken.getText() + " is not supported");
         }
-        return binaryToken.biFunction.apply(left, right);
+        return binaryToken.convert.apply(left, right);
     }
 }
