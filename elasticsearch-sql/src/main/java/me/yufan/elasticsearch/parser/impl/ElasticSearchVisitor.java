@@ -2,10 +2,12 @@ package me.yufan.elasticsearch.parser.impl;
 
 import me.yufan.elasticsearch.common.logging.Logger;
 import me.yufan.elasticsearch.common.logging.LoggerFactory;
+import me.yufan.elasticsearch.common.utils.CollectionUtils;
 import me.yufan.elasticsearch.model.BooleanExpr;
 import me.yufan.elasticsearch.model.Operand;
 import me.yufan.elasticsearch.model.operands.LimitOperand;
 import me.yufan.elasticsearch.model.operands.OrderByOperand;
+import me.yufan.elasticsearch.model.operands.column.AliasOperand;
 import me.yufan.elasticsearch.parser.ElasticSearchParser;
 import me.yufan.elasticsearch.parser.ElasticSearchParserVisitor;
 import me.yufan.elasticsearch.parser.ParserResult;
@@ -15,9 +17,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserResult> {
@@ -26,6 +26,9 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     // A temp space to hold the parser tree, because we use DFS.
     private Deque<Object> parserHolder = new ArrayDeque<>();
+
+    // SELECT name part, this field would be the back up for process cycle in case of missing field in column table name
+    private String defaultTableName;
 
     private SQLTemplate template = new SQLTemplate();
 
@@ -44,7 +47,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
         if (ctx.tableRef() != null) {
             ParserResult tableRef = visitTableRef(ctx.tableRef());
             if (tableRef.isSuccess()) {
-                template.setTable(String.class.cast(parserHolder.pop()));
+                template.setTable((String) parserHolder.pop());
             } else {
                 return tableRef;
             }
@@ -60,7 +63,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
         if (ctx.whereClause() != null) {
             ParserResult whereClause = visitWhereClause(ctx.whereClause());
             if (whereClause.isSuccess()) {
-                template.setWhereClause(BooleanExpr.class.cast(parserHolder.pop()));
+                template.setWhereClause((BooleanExpr) parserHolder.pop());
             } else {
                 return whereClause;
             }
@@ -84,7 +87,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
         if (ctx.limitClause() != null) {
             ParserResult limitClause = visitLimitClause(ctx.limitClause());
             if (limitClause.isSuccess()) {
-                template.setLimit(LimitOperand.class.cast(parserHolder.pop()));
+                template.setLimit((LimitOperand) parserHolder.pop());
             } else {
                 return limitClause;
             }
@@ -99,12 +102,68 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitColumnList(ElasticSearchParser.ColumnListContext ctx) {
-        return null;
+        List<ElasticSearchParser.NameOperandContext> nameOperands = ctx.nameOperand();
+        if (CollectionUtils.isEmpty(nameOperands)) {
+            return ParserResult.failed("Missing need select column");
+        } else {
+            List<Operand> operands = new ArrayList<>(nameOperands.size());
+            for (ElasticSearchParser.NameOperandContext operand : nameOperands) {
+                ParserResult result = visitNameOperand(operand);
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                Operand op = (Operand) parserHolder.pop();
+                operands.add(op);
+            }
+            parserHolder.push(operands);
+            return ParserResult.success();
+        }
     }
 
     @Override
     public ParserResult visitNameOperand(ElasticSearchParser.NameOperandContext ctx) {
-        return null;
+        // Back up table for further restore
+        parserHolder.push(defaultTableName);
+        if (ctx.tableName != null) {
+            String tableNameText = ctx.tableName.getText();
+            if (!Objects.equals(tableNameText, defaultTableName)) {
+                log.warn("The select table name " + defaultTableName + " is not equal with column table name " + tableNameText);
+            }
+            defaultTableName = tableNameText; // This would be used in sub-name parser process (one day ?)
+        }
+
+        ParserResult name = visitName(ctx.columName);
+        if (name.isSuccess()) {
+            Operand innerOperand = (Operand) parserHolder.pop();
+            defaultTableName = (String) parserHolder.pop();
+
+            if (ctx.alias != null) {
+                parserHolder.push(new AliasOperand(innerOperand, ctx.alias.getText()));
+            } else {
+                parserHolder.push(innerOperand);
+            }
+            return ParserResult.success();
+        } else {
+            return name;
+        }
+    }
+
+    // Helper method for dispatch visit to different name field
+    private ParserResult visitName(ElasticSearchParser.NameContext ctx) {
+        if (ctx instanceof ElasticSearchParser.LRNameContext) {
+            return visitLRName((ElasticSearchParser.LRNameContext) ctx);
+        } else if (ctx instanceof ElasticSearchParser.DistinctContext) {
+            return visitDistinct((ElasticSearchParser.DistinctContext) ctx);
+        } else if (ctx instanceof ElasticSearchParser.MulNameContext) {
+            return visitMulName((ElasticSearchParser.MulNameContext) ctx);
+        } else if (ctx instanceof ElasticSearchParser.AddNameContext) {
+            return visitAddName((ElasticSearchParser.AddNameContext) ctx);
+        } else if (ctx instanceof ElasticSearchParser.AggregationNameContext) {
+            return visitAggregationName((ElasticSearchParser.AggregationNameContext) ctx);
+        } else if (ctx instanceof ElasticSearchParser.ColumnNameContext) {
+            return visitColumnName((ElasticSearchParser.ColumnNameContext) ctx);
+        }
+        return ParserResult.failed("The name type is not a supported class " + ctx.getClass().getName());
     }
 
     @Override
@@ -264,7 +323,9 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitTableRef(ElasticSearchParser.TableRefContext ctx) {
-        parserHolder.push(ctx.getText()); // Table alias is not supported currently
+        defaultTableName = ctx.getText();
+        parserHolder.push(defaultTableName); // Table alias is not supported currently
+        log.debug("The table name is " + defaultTableName);
         return ParserResult.success();
     }
 
@@ -296,7 +357,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
     @Override
     public ParserResult visit(ParseTree tree) {
         if (tree instanceof ElasticSearchParser.ProgContext) {
-            return visitProg(ElasticSearchParser.ProgContext.class.cast(tree));
+            return visitProg((ElasticSearchParser.ProgContext) tree);
         }
         return ParserResult.failed("The antlr4 parsed entry point is not prog, check your g4 syntax");
     }
