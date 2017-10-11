@@ -7,12 +7,13 @@ import me.yufan.elasticsearch.model.BooleanExpr;
 import me.yufan.elasticsearch.model.Operand;
 import me.yufan.elasticsearch.model.operands.LimitOperand;
 import me.yufan.elasticsearch.model.operands.OrderByOperand;
+import me.yufan.elasticsearch.model.operands.binary.BinaryOperand;
 import me.yufan.elasticsearch.model.operands.column.AliasOperand;
 import me.yufan.elasticsearch.model.operands.column.DistinctOperand;
-import me.yufan.elasticsearch.model.operands.primitive.*;
-import me.yufan.elasticsearch.model.operands.enums.BinaryToken;
+import me.yufan.elasticsearch.model.operands.enums.BinaryType;
 import me.yufan.elasticsearch.model.operands.function.FunctionFactory;
 import me.yufan.elasticsearch.model.operands.function.FunctionOperand;
+import me.yufan.elasticsearch.model.operands.primitive.*;
 import me.yufan.elasticsearch.parser.ElasticSearchParser;
 import me.yufan.elasticsearch.parser.ElasticSearchParserVisitor;
 import me.yufan.elasticsearch.parser.ParserResult;
@@ -184,7 +185,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
         Operand rightOp = (Operand) parserHolder.pop();
 
         try {
-            Operand binaryOp = BinaryToken.newInstance(ctx.op, leftOp, rightOp);
+            BinaryOperand binaryOp = BinaryType.newInstance(ctx.op, leftOp, rightOp);
             parserHolder.push(binaryOp);
         } catch (ParseException e) {
             log.error(e.getMessage(), e);
@@ -233,7 +234,8 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitColumnName(ElasticSearchParser.ColumnNameContext ctx) {
-        return null;
+        ElasticSearchParser.IdentityContext identity = ctx.identity();
+        return visitIdentity(identity);
     }
 
     @Override
@@ -427,16 +429,16 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitChildren(RuleNode node) {
-        return null;
+        throw new UnsupportedOperationException("No children visitor implemented");
     }
 
     @Override
     public ParserResult visitTerminal(TerminalNode node) {
-        return null;
+        throw new UnsupportedOperationException("No terminal visitor implemented");
     }
 
     @Override
     public ParserResult visitErrorNode(ErrorNode node) {
-        return null;
+        throw new UnsupportedOperationException("Error would be thrown by ThrowingExceptionErrorStrategy");
     }
 }
