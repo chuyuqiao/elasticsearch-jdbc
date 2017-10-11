@@ -60,8 +60,7 @@ name
 :
     LPAREN name RPAREN # LRName
     | DISTINCT columnName = name #distinct
-    | left = name op = (STAR | SLASH | MOD) right = name # MulName
-    | left = name op = (PLUS | SUB) right = name # AddName
+    | left = name op = (STAR | SLASH | MOD | PLUS | SUB) right = name # BinaryName
     | ID LPAREN columnName = name RPAREN # AggregationName
     | identity # columnName
 ;

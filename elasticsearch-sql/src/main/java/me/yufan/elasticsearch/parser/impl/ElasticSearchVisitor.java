@@ -8,10 +8,13 @@ import me.yufan.elasticsearch.model.Operand;
 import me.yufan.elasticsearch.model.operands.LimitOperand;
 import me.yufan.elasticsearch.model.operands.OrderByOperand;
 import me.yufan.elasticsearch.model.operands.column.AliasOperand;
+import me.yufan.elasticsearch.model.operands.column.DistinctOperand;
+import me.yufan.elasticsearch.model.operands.enums.BinaryToken;
 import me.yufan.elasticsearch.parser.ElasticSearchParser;
 import me.yufan.elasticsearch.parser.ElasticSearchParserVisitor;
 import me.yufan.elasticsearch.parser.ParserResult;
 import me.yufan.elasticsearch.parser.SQLTemplate;
+import me.yufan.elasticsearch.parser.exception.ParseException;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -154,10 +157,8 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
             return visitLRName((ElasticSearchParser.LRNameContext) ctx);
         } else if (ctx instanceof ElasticSearchParser.DistinctContext) {
             return visitDistinct((ElasticSearchParser.DistinctContext) ctx);
-        } else if (ctx instanceof ElasticSearchParser.MulNameContext) {
-            return visitMulName((ElasticSearchParser.MulNameContext) ctx);
-        } else if (ctx instanceof ElasticSearchParser.AddNameContext) {
-            return visitAddName((ElasticSearchParser.AddNameContext) ctx);
+        } else if (ctx instanceof ElasticSearchParser.BinaryNameContext) {
+            return visitBinaryName((ElasticSearchParser.BinaryNameContext) ctx);
         } else if (ctx instanceof ElasticSearchParser.AggregationNameContext) {
             return visitAggregationName((ElasticSearchParser.AggregationNameContext) ctx);
         } else if (ctx instanceof ElasticSearchParser.ColumnNameContext) {
@@ -167,8 +168,26 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
     }
 
     @Override
-    public ParserResult visitMulName(ElasticSearchParser.MulNameContext ctx) {
-        return null;
+    public ParserResult visitBinaryName(ElasticSearchParser.BinaryNameContext ctx) {
+        ParserResult left = visitName(ctx.left);
+        if (!left.isSuccess()) {
+            return left;
+        }
+        Operand leftOp = (Operand) parserHolder.pop();
+        ParserResult right = visitName(ctx.right);
+        if (!right.isSuccess()) {
+            return right;
+        }
+        Operand rightOp = (Operand) parserHolder.pop();
+
+        try {
+            Operand binaryOp = BinaryToken.newInstance(ctx.op, leftOp, rightOp);
+            parserHolder.push(binaryOp);
+        } catch (ParseException e) {
+            log.error(e.getMessage() + e);
+            return ParserResult.failed(e.getMessage());
+        }
+        return ParserResult.success();
     }
 
     @Override
@@ -177,18 +196,22 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
     }
 
     @Override
-    public ParserResult visitAddName(ElasticSearchParser.AddNameContext ctx) {
-        return null;
-    }
-
-    @Override
     public ParserResult visitLRName(ElasticSearchParser.LRNameContext ctx) {
-        return null;
+        // (name) format
+        return visitName(ctx.name());
     }
 
     @Override
     public ParserResult visitDistinct(ElasticSearchParser.DistinctContext ctx) {
-        return null;
+        ParserResult visitName = visitName(ctx.name());
+        if (!visitName.isSuccess()) {
+            return visitName;
+        } else {
+            Operand nameOp = (Operand) parserHolder.pop();
+            DistinctOperand operand = new DistinctOperand(nameOp);
+            parserHolder.push(operand);
+            return ParserResult.success();
+        }
     }
 
     @Override
