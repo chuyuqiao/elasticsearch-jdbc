@@ -294,7 +294,7 @@
               </goals>
               <phase>generate-sources</phase>
               <configuration>
-                <listener>true</listener>
+                <listener>false</listener>
                 <visitor>true</visitor>
               </configuration>
             </execution>

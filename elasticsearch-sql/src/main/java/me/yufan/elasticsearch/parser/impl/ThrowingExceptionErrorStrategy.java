@@ -19,11 +19,15 @@ public class ThrowingExceptionErrorStrategy extends DefaultErrorStrategy {
      * throw an exception.
      */
     @Override
-    public Token recoverInline(Parser recognizer) throws RecognitionException {
+    public Token recoverInline(Parser recognizer) {
         throw new InputMismatchException(recognizer);
     }
 
-    /** Make sure we don't attempt to recover from problems in subrules. */
+    /**
+     * Make sure we don't attempt to recover from problems in subrules.
+     */
     @Override
-    public void sync(Parser recognizer) {}
+    public void sync(Parser recognizer) {
+        // No need to use
+    }
 }

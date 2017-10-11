@@ -38,9 +38,9 @@ public class ParserEngine {
         ElasticSearchParser.ProgContext progTree = parser.prog();
         ElasticSearchVisitor visitor = new ElasticSearchVisitor();
 
-        SQLTemplate parsedResult = visitor.visit(progTree);
+        ParserResult parsedResult = visitor.visit(progTree);
         if (parsedResult.isSuccess()) {
-            return parsedResult;
+            return parsedResult.getTemplate();
         }
         throw new ElasticSearchSQLException("SQL parser error !!! " + parsedResult.getFailureReason());
     }

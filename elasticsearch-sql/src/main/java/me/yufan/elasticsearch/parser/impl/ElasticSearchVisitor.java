@@ -1,242 +1,315 @@
 package me.yufan.elasticsearch.parser.impl;
 
+import me.yufan.elasticsearch.model.BooleanExpr;
+import me.yufan.elasticsearch.model.Operand;
+import me.yufan.elasticsearch.model.operands.LimitOperand;
+import me.yufan.elasticsearch.model.operands.OrderByOperand;
 import me.yufan.elasticsearch.parser.ElasticSearchParser;
 import me.yufan.elasticsearch.parser.ElasticSearchParserVisitor;
+import me.yufan.elasticsearch.parser.ParserResult;
 import me.yufan.elasticsearch.parser.SQLTemplate;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class ElasticSearchVisitor implements ElasticSearchParserVisitor<SQLTemplate> {
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+
+@SuppressWarnings("unchecked")
+public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserResult> {
+
+    // A temp space to hold the parser tree, because we use DFS.
+    private Deque<Object> parserHolder = new ArrayDeque<>();
+
+    private SQLTemplate template = new SQLTemplate();
+
+    private String defaultTableName;
 
     @Override
-    public SQLTemplate visitProg(ElasticSearchParser.ProgContext ctx) {
+    public ParserResult visitProg(ElasticSearchParser.ProgContext ctx) {
+        if (ctx.selectOperation() != null) {
+            return visitSelectOperation(ctx.selectOperation());
+        } else if (ctx.deleteOperation() != null) {
+            return visitDeleteOperation(ctx.deleteOperation());
+        }
+        return ParserResult.failed("AST tree has some extra grammar module that program couldn't transform.");
+    }
+
+    @Override
+    public ParserResult visitSelectOperation(ElasticSearchParser.SelectOperationContext ctx) {
+        if (ctx.tableRef() != null) {
+            ParserResult tableRef = visitTableRef(ctx.tableRef());
+            if (tableRef.isSuccess()) {
+                template.setTable(String.class.cast(parserHolder.pop()));
+            } else {
+                return tableRef;
+            }
+        }
+        if (ctx.columList() != null) {
+            ParserResult columnList = visitColumList(ctx.columList());
+            if (columnList.isSuccess()) {
+                template.setColumns((List<Operand>) parserHolder.pop());
+            } else {
+                return columnList;
+            }
+        }
+        if (ctx.whereClause() != null) {
+            ParserResult whereClause = visitWhereClause(ctx.whereClause());
+            if (whereClause.isSuccess()) {
+                template.setWhereClause(BooleanExpr.class.cast(parserHolder.pop()));
+            } else {
+                return whereClause;
+            }
+        }
+        if (ctx.groupClause() != null) {
+            ParserResult groupClause = visitGroupClause(ctx.groupClause());
+            if (groupClause.isSuccess()) {
+                template.setGroupBys((List<Operand>) parserHolder.pop());
+            } else {
+                return groupClause;
+            }
+        }
+        if (ctx.orderClause() != null) {
+            ParserResult orderClause = visitOrderClause(ctx.orderClause());
+            if (orderClause.isSuccess()) {
+                template.setOrderBy((List<OrderByOperand>) parserHolder.pop());
+            } else {
+                return orderClause;
+            }
+        }
+        if (ctx.limitClause() != null) {
+            ParserResult limitClause = visitLimitClause(ctx.limitClause());
+            if (limitClause.isSuccess()) {
+                template.setLimit(LimitOperand.class.cast(parserHolder.pop()));
+            } else {
+                return limitClause;
+            }
+        }
+        return ParserResult.success(template);
+    }
+
+    @Override
+    public ParserResult visitDeleteOperation(ElasticSearchParser.DeleteOperationContext ctx) {
+        throw new UnsupportedOperationException("DELETE is not supported currently.");
+    }
+
+    @Override
+    public ParserResult visitColumList(ElasticSearchParser.ColumListContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitSelectOperation(ElasticSearchParser.SelectOperationContext ctx) {
+    public ParserResult visitNameOprand(ElasticSearchParser.NameOprandContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitDeleteOperation(ElasticSearchParser.DeleteOperationContext ctx) {
+    public ParserResult visitMulName(ElasticSearchParser.MulNameContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitColumList(ElasticSearchParser.ColumListContext ctx) {
+    public ParserResult visitAggregationName(ElasticSearchParser.AggregationNameContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitNameOprand(ElasticSearchParser.NameOprandContext ctx) {
+    public ParserResult visitAddName(ElasticSearchParser.AddNameContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitMulName(ElasticSearchParser.MulNameContext ctx) {
+    public ParserResult visitLRName(ElasticSearchParser.LRNameContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitAggregationName(ElasticSearchParser.AggregationNameContext ctx) {
+    public ParserResult visitDistinct(ElasticSearchParser.DistinctContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitAddName(ElasticSearchParser.AddNameContext ctx) {
+    public ParserResult visitColumnName(ElasticSearchParser.ColumnNameContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitLRName(ElasticSearchParser.LRNameContext ctx) {
+    public ParserResult visitIdEle(ElasticSearchParser.IdEleContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitDistinct(ElasticSearchParser.DistinctContext ctx) {
+    public ParserResult visitIntEle(ElasticSearchParser.IntEleContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitColumnName(ElasticSearchParser.ColumnNameContext ctx) {
+    public ParserResult visitFloatEle(ElasticSearchParser.FloatEleContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitIdEle(ElasticSearchParser.IdEleContext ctx) {
+    public ParserResult visitStringEle(ElasticSearchParser.StringEleContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitIntEle(ElasticSearchParser.IntEleContext ctx) {
+    public ParserResult visitNameOpr(ElasticSearchParser.NameOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitFloatEle(ElasticSearchParser.FloatEleContext ctx) {
+    public ParserResult visitGtOpr(ElasticSearchParser.GtOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitStringEle(ElasticSearchParser.StringEleContext ctx) {
+    public ParserResult visitEqOpr(ElasticSearchParser.EqOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitNameOpr(ElasticSearchParser.NameOprContext ctx) {
+    public ParserResult visitLrExpr(ElasticSearchParser.LrExprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitGtOpr(ElasticSearchParser.GtOprContext ctx) {
+    public ParserResult visitAndOpr(ElasticSearchParser.AndOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitEqOpr(ElasticSearchParser.EqOprContext ctx) {
+    public ParserResult visitLteqOpr(ElasticSearchParser.LteqOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitLrExpr(ElasticSearchParser.LrExprContext ctx) {
+    public ParserResult visitNotEqOpr(ElasticSearchParser.NotEqOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitAndOpr(ElasticSearchParser.AndOprContext ctx) {
+    public ParserResult visitInBooleanExpr(ElasticSearchParser.InBooleanExprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitLteqOpr(ElasticSearchParser.LteqOprContext ctx) {
+    public ParserResult visitLtOpr(ElasticSearchParser.LtOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitNotEqOpr(ElasticSearchParser.NotEqOprContext ctx) {
+    public ParserResult visitGteqOpr(ElasticSearchParser.GteqOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitInBooleanExpr(ElasticSearchParser.InBooleanExprContext ctx) {
+    public ParserResult visitOrOpr(ElasticSearchParser.OrOprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitLtOpr(ElasticSearchParser.LtOprContext ctx) {
+    public ParserResult visitBetweenExpr(ElasticSearchParser.BetweenExprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitGteqOpr(ElasticSearchParser.GteqOprContext ctx) {
+    public ParserResult visitInExpr(ElasticSearchParser.InExprContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitOrOpr(ElasticSearchParser.OrOprContext ctx) {
+    public ParserResult visitInOp(ElasticSearchParser.InOpContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitBetweenExpr(ElasticSearchParser.BetweenExprContext ctx) {
+    public ParserResult visitNotInOp(ElasticSearchParser.NotInOpContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitInExpr(ElasticSearchParser.InExprContext ctx) {
+    public ParserResult visitInRightOprandList(ElasticSearchParser.InRightOprandListContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitInOp(ElasticSearchParser.InOpContext ctx) {
+    public ParserResult visitConstLiteral(ElasticSearchParser.ConstLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitNotInOp(ElasticSearchParser.NotInOpContext ctx) {
+    public ParserResult visitArithmeticLiteral(ElasticSearchParser.ArithmeticLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitInRightOprandList(ElasticSearchParser.InRightOprandListContext ctx) {
+    public ParserResult visitIntLiteral(ElasticSearchParser.IntLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitConstLiteral(ElasticSearchParser.ConstLiteralContext ctx) {
+    public ParserResult visitFloatLiteral(ElasticSearchParser.FloatLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitArithmeticLiteral(ElasticSearchParser.ArithmeticLiteralContext ctx) {
+    public ParserResult visitStringLiteral(ElasticSearchParser.StringLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitIntLiteral(ElasticSearchParser.IntLiteralContext ctx) {
+    public ParserResult visitTableRef(ElasticSearchParser.TableRefContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitFloatLiteral(ElasticSearchParser.FloatLiteralContext ctx) {
+    public ParserResult visitWhereClause(ElasticSearchParser.WhereClauseContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitStringLiteral(ElasticSearchParser.StringLiteralContext ctx) {
+    public ParserResult visitGroupClause(ElasticSearchParser.GroupClauseContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitTableRef(ElasticSearchParser.TableRefContext ctx) {
+    public ParserResult visitOrderClause(ElasticSearchParser.OrderClauseContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitWhereClause(ElasticSearchParser.WhereClauseContext ctx) {
+    public ParserResult visitOrder(ElasticSearchParser.OrderContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitGroupClause(ElasticSearchParser.GroupClauseContext ctx) {
+    public ParserResult visitLimitClause(ElasticSearchParser.LimitClauseContext ctx) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitOrderClause(ElasticSearchParser.OrderClauseContext ctx) {
+    public ParserResult visit(ParseTree tree) {
+        if (tree instanceof ElasticSearchParser.ProgContext) {
+            return visitProg(ElasticSearchParser.ProgContext.class.cast(tree));
+        }
+        return ParserResult.failed("The antlr4 parsed entry point is not prog, check your g4 syntax");
+    }
+
+    @Override
+    public ParserResult visitChildren(RuleNode node) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitOrder(ElasticSearchParser.OrderContext ctx) {
+    public ParserResult visitTerminal(TerminalNode node) {
         return null;
     }
 
     @Override
-    public SQLTemplate visitLimitClause(ElasticSearchParser.LimitClauseContext ctx) {
-        return null;
-    }
-
-    @Override
-    public SQLTemplate visit(ParseTree tree) {
-        return null;
-    }
-
-    @Override
-    public SQLTemplate visitChildren(RuleNode node) {
-        return null;
-    }
-
-    @Override
-    public SQLTemplate visitTerminal(TerminalNode node) {
-        return null;
-    }
-
-    @Override
-    public SQLTemplate visitErrorNode(ErrorNode node) {
+    public ParserResult visitErrorNode(ErrorNode node) {
         return null;
     }
 }
