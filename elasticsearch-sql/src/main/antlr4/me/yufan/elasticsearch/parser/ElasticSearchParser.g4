@@ -88,6 +88,7 @@ boolExpr
     | left = boolExpr BANGEQ right = boolExpr # notEqOpr
     | left = boolExpr AND right = boolExpr # andOpr
     | left = boolExpr OR right = boolExpr # orOpr
+    | left = boolExpr BETWEEN right = boolExpr # betweenExpr
     | inExpr # inBooleanExpr
     | name # nameOpr
 ;

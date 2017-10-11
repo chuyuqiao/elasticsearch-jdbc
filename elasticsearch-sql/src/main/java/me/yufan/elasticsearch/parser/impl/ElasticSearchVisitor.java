@@ -141,6 +141,11 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<Query> {
     }
 
     @Override
+    public Query visitBetweenExpr(ElasticSearchParser.BetweenExprContext ctx) {
+        return null;
+    }
+
+    @Override
     public Query visitInExpr(ElasticSearchParser.InExprContext ctx) {
         return null;
     }
