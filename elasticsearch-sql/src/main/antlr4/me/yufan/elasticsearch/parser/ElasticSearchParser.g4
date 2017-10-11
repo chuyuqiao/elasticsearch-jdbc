@@ -28,9 +28,6 @@ selectOperation
     (
         limitClause
     )?
-    (
-        granularityClause
-    )?
 ;
 
 deleteOperation
@@ -175,31 +172,4 @@ limitClause
     (
         offset = INT
     )? resultCount = INT
-;
-
-granularityClause
-:
-    BREAK BY granularityExpr
-;
-
-granularityExpr
-:
-    simple =
-    (
-        ALL
-        | NONE
-        | MINUTE
-        | FIFTEEN_MINUTE
-        | THIRTY_MINUTE
-        | HOUR
-        | DAY
-    ) # simpleGran
-    |
-    (
-        left = INT TO
-    )? right = INT # durationGran
-    |
-    (
-        left = INT TO
-    ) right = ID AS timeZone = ID # periodGran
 ;

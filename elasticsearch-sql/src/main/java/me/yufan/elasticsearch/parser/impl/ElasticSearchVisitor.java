@@ -2,261 +2,241 @@ package me.yufan.elasticsearch.parser.impl;
 
 import me.yufan.elasticsearch.parser.ElasticSearchParser;
 import me.yufan.elasticsearch.parser.ElasticSearchParserVisitor;
-import me.yufan.elasticsearch.parser.Query;
+import me.yufan.elasticsearch.parser.SQLTemplate;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class ElasticSearchVisitor implements ElasticSearchParserVisitor<Query> {
+public class ElasticSearchVisitor implements ElasticSearchParserVisitor<SQLTemplate> {
 
     @Override
-    public Query visitProg(ElasticSearchParser.ProgContext ctx) {
+    public SQLTemplate visitProg(ElasticSearchParser.ProgContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitSelectOperation(ElasticSearchParser.SelectOperationContext ctx) {
+    public SQLTemplate visitSelectOperation(ElasticSearchParser.SelectOperationContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitDeleteOperation(ElasticSearchParser.DeleteOperationContext ctx) {
+    public SQLTemplate visitDeleteOperation(ElasticSearchParser.DeleteOperationContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitColumList(ElasticSearchParser.ColumListContext ctx) {
+    public SQLTemplate visitColumList(ElasticSearchParser.ColumListContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitNameOprand(ElasticSearchParser.NameOprandContext ctx) {
+    public SQLTemplate visitNameOprand(ElasticSearchParser.NameOprandContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitMulName(ElasticSearchParser.MulNameContext ctx) {
+    public SQLTemplate visitMulName(ElasticSearchParser.MulNameContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitAggregationName(ElasticSearchParser.AggregationNameContext ctx) {
+    public SQLTemplate visitAggregationName(ElasticSearchParser.AggregationNameContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitAddName(ElasticSearchParser.AddNameContext ctx) {
+    public SQLTemplate visitAddName(ElasticSearchParser.AddNameContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitLRName(ElasticSearchParser.LRNameContext ctx) {
+    public SQLTemplate visitLRName(ElasticSearchParser.LRNameContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitDistinct(ElasticSearchParser.DistinctContext ctx) {
+    public SQLTemplate visitDistinct(ElasticSearchParser.DistinctContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitColumnName(ElasticSearchParser.ColumnNameContext ctx) {
+    public SQLTemplate visitColumnName(ElasticSearchParser.ColumnNameContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitIdEle(ElasticSearchParser.IdEleContext ctx) {
+    public SQLTemplate visitIdEle(ElasticSearchParser.IdEleContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitIntEle(ElasticSearchParser.IntEleContext ctx) {
+    public SQLTemplate visitIntEle(ElasticSearchParser.IntEleContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitFloatEle(ElasticSearchParser.FloatEleContext ctx) {
+    public SQLTemplate visitFloatEle(ElasticSearchParser.FloatEleContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitStringEle(ElasticSearchParser.StringEleContext ctx) {
+    public SQLTemplate visitStringEle(ElasticSearchParser.StringEleContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitNameOpr(ElasticSearchParser.NameOprContext ctx) {
+    public SQLTemplate visitNameOpr(ElasticSearchParser.NameOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitGtOpr(ElasticSearchParser.GtOprContext ctx) {
+    public SQLTemplate visitGtOpr(ElasticSearchParser.GtOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitEqOpr(ElasticSearchParser.EqOprContext ctx) {
+    public SQLTemplate visitEqOpr(ElasticSearchParser.EqOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitLrExpr(ElasticSearchParser.LrExprContext ctx) {
+    public SQLTemplate visitLrExpr(ElasticSearchParser.LrExprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitAndOpr(ElasticSearchParser.AndOprContext ctx) {
+    public SQLTemplate visitAndOpr(ElasticSearchParser.AndOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitLteqOpr(ElasticSearchParser.LteqOprContext ctx) {
+    public SQLTemplate visitLteqOpr(ElasticSearchParser.LteqOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitNotEqOpr(ElasticSearchParser.NotEqOprContext ctx) {
+    public SQLTemplate visitNotEqOpr(ElasticSearchParser.NotEqOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitInBooleanExpr(ElasticSearchParser.InBooleanExprContext ctx) {
+    public SQLTemplate visitInBooleanExpr(ElasticSearchParser.InBooleanExprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitLtOpr(ElasticSearchParser.LtOprContext ctx) {
+    public SQLTemplate visitLtOpr(ElasticSearchParser.LtOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitGteqOpr(ElasticSearchParser.GteqOprContext ctx) {
+    public SQLTemplate visitGteqOpr(ElasticSearchParser.GteqOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitOrOpr(ElasticSearchParser.OrOprContext ctx) {
+    public SQLTemplate visitOrOpr(ElasticSearchParser.OrOprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitBetweenExpr(ElasticSearchParser.BetweenExprContext ctx) {
+    public SQLTemplate visitBetweenExpr(ElasticSearchParser.BetweenExprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitInExpr(ElasticSearchParser.InExprContext ctx) {
+    public SQLTemplate visitInExpr(ElasticSearchParser.InExprContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitInOp(ElasticSearchParser.InOpContext ctx) {
+    public SQLTemplate visitInOp(ElasticSearchParser.InOpContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitNotInOp(ElasticSearchParser.NotInOpContext ctx) {
+    public SQLTemplate visitNotInOp(ElasticSearchParser.NotInOpContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitInRightOprandList(ElasticSearchParser.InRightOprandListContext ctx) {
+    public SQLTemplate visitInRightOprandList(ElasticSearchParser.InRightOprandListContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitConstLiteral(ElasticSearchParser.ConstLiteralContext ctx) {
+    public SQLTemplate visitConstLiteral(ElasticSearchParser.ConstLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitArithmeticLiteral(ElasticSearchParser.ArithmeticLiteralContext ctx) {
+    public SQLTemplate visitArithmeticLiteral(ElasticSearchParser.ArithmeticLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitIntLiteral(ElasticSearchParser.IntLiteralContext ctx) {
+    public SQLTemplate visitIntLiteral(ElasticSearchParser.IntLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitFloatLiteral(ElasticSearchParser.FloatLiteralContext ctx) {
+    public SQLTemplate visitFloatLiteral(ElasticSearchParser.FloatLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitStringLiteral(ElasticSearchParser.StringLiteralContext ctx) {
+    public SQLTemplate visitStringLiteral(ElasticSearchParser.StringLiteralContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitTableRef(ElasticSearchParser.TableRefContext ctx) {
+    public SQLTemplate visitTableRef(ElasticSearchParser.TableRefContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitWhereClause(ElasticSearchParser.WhereClauseContext ctx) {
+    public SQLTemplate visitWhereClause(ElasticSearchParser.WhereClauseContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitGroupClause(ElasticSearchParser.GroupClauseContext ctx) {
+    public SQLTemplate visitGroupClause(ElasticSearchParser.GroupClauseContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitOrderClause(ElasticSearchParser.OrderClauseContext ctx) {
+    public SQLTemplate visitOrderClause(ElasticSearchParser.OrderClauseContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitOrder(ElasticSearchParser.OrderContext ctx) {
+    public SQLTemplate visitOrder(ElasticSearchParser.OrderContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitLimitClause(ElasticSearchParser.LimitClauseContext ctx) {
+    public SQLTemplate visitLimitClause(ElasticSearchParser.LimitClauseContext ctx) {
         return null;
     }
 
     @Override
-    public Query visitGranularityClause(ElasticSearchParser.GranularityClauseContext ctx) {
+    public SQLTemplate visit(ParseTree tree) {
         return null;
     }
 
     @Override
-    public Query visitSimpleGran(ElasticSearchParser.SimpleGranContext ctx) {
+    public SQLTemplate visitChildren(RuleNode node) {
         return null;
     }
 
     @Override
-    public Query visitDurationGran(ElasticSearchParser.DurationGranContext ctx) {
+    public SQLTemplate visitTerminal(TerminalNode node) {
         return null;
     }
 
     @Override
-    public Query visitPeriodGran(ElasticSearchParser.PeriodGranContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Query visit(ParseTree tree) {
-        return null;
-    }
-
-    @Override
-    public Query visitChildren(RuleNode node) {
-        return null;
-    }
-
-    @Override
-    public Query visitTerminal(TerminalNode node) {
-        return null;
-    }
-
-    @Override
-    public Query visitErrorNode(ErrorNode node) {
+    public SQLTemplate visitErrorNode(ErrorNode node) {
         return null;
     }
 }

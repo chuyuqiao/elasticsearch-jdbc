@@ -14,7 +14,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 @UtilityClass
 public class ParserEngine {
 
-    public static Query parse(String sql) {
+    public static SQLTemplate parse(String sql) {
         if (StringUtils.isBlank(sql)) {
             throw new ElasticSearchSQLException("blank sql is not allowed");
         }
@@ -38,7 +38,7 @@ public class ParserEngine {
         ElasticSearchParser.ProgContext progTree = parser.prog();
         ElasticSearchVisitor visitor = new ElasticSearchVisitor();
 
-        Query parsedResult = visitor.visit(progTree);
+        SQLTemplate parsedResult = visitor.visit(progTree);
         if (parsedResult.isSuccess()) {
             return parsedResult;
         }
