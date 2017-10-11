@@ -1,5 +1,7 @@
 package me.yufan.elasticsearch.parser.impl;
 
+import me.yufan.elasticsearch.common.logging.Logger;
+import me.yufan.elasticsearch.common.logging.LoggerFactory;
 import me.yufan.elasticsearch.model.BooleanExpr;
 import me.yufan.elasticsearch.model.Operand;
 import me.yufan.elasticsearch.model.operands.LimitOperand;
@@ -20,12 +22,12 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserResult> {
 
+    private static final Logger log = LoggerFactory.getLog(ElasticSearchVisitor.class);
+
     // A temp space to hold the parser tree, because we use DFS.
     private Deque<Object> parserHolder = new ArrayDeque<>();
 
     private SQLTemplate template = new SQLTemplate();
-
-    private String defaultTableName;
 
     @Override
     public ParserResult visitProg(ElasticSearchParser.ProgContext ctx) {
@@ -47,8 +49,8 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
                 return tableRef;
             }
         }
-        if (ctx.columList() != null) {
-            ParserResult columnList = visitColumList(ctx.columList());
+        if (ctx.columnList() != null) {
+            ParserResult columnList = visitColumnList(ctx.columnList());
             if (columnList.isSuccess()) {
                 template.setColumns((List<Operand>) parserHolder.pop());
             } else {
@@ -96,12 +98,12 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
     }
 
     @Override
-    public ParserResult visitColumList(ElasticSearchParser.ColumListContext ctx) {
+    public ParserResult visitColumnList(ElasticSearchParser.ColumnListContext ctx) {
         return null;
     }
 
     @Override
-    public ParserResult visitNameOprand(ElasticSearchParser.NameOprandContext ctx) {
+    public ParserResult visitNameOperand(ElasticSearchParser.NameOperandContext ctx) {
         return null;
     }
 
@@ -231,7 +233,7 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
     }
 
     @Override
-    public ParserResult visitInRightOprandList(ElasticSearchParser.InRightOprandListContext ctx) {
+    public ParserResult visitInRightOperandList(ElasticSearchParser.InRightOperandListContext ctx) {
         return null;
     }
 
@@ -262,7 +264,8 @@ public class ElasticSearchVisitor implements ElasticSearchParserVisitor<ParserRe
 
     @Override
     public ParserResult visitTableRef(ElasticSearchParser.TableRefContext ctx) {
-        return null;
+        parserHolder.push(ctx.getText()); // Table alias is not supported currently
+        return ParserResult.success();
     }
 
     @Override

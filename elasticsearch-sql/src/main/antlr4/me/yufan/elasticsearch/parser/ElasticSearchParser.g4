@@ -15,7 +15,7 @@ prog
 
 selectOperation
 :
-    SELECT columList FROM tableRef
+    SELECT columnList FROM tableRef
     (
         whereClause
     )?
@@ -38,15 +38,15 @@ deleteOperation
     )?
 ;
 
-columList
+columnList
 :
-    nameOprand
+    nameOperand
     (
-        COMMA nameOprand
+        COMMA nameOperand
     )*
 ;
 
-nameOprand
+nameOperand
 :
     (
         tableName = ID DOT
@@ -92,7 +92,7 @@ boolExpr
 
 inExpr
 :
-    left = identity in_or_not_in right = inRightOprandList
+    left = identity in_or_not_in right = inRightOperandList
 ;
 
 in_or_not_in
@@ -101,16 +101,16 @@ in_or_not_in
     | NOT IN # notInOp
 ;
 
-inRightOprandList
+inRightOperandList
 :
-    inRightOprand
-    |LPAREN inRightOprand (COMMA inRightOprand)* RPAREN
+    inRightOperand
+    |LPAREN inRightOperand (COMMA inRightOperand)* RPAREN
 ;
 
-inRightOprand
+inRightOperand
 :
     const_literal # constLiteral
-    |left = inRightOprand op =
+    |left = inRightOperand op =
     (
         STAR
         | SLASH
@@ -118,7 +118,7 @@ inRightOprand
         | PLUS
         | MINUS
     )
-    right = inRightOprand # arithmeticLiteral
+    right = inRightOperand # arithmeticLiteral
 ;
 
 const_literal

@@ -7,6 +7,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ParserResult {
 
+    private static final ParserResult SUCCESS_FLAG = new ParserResult().setSuccess(true);
+
     /**
      * Parsing status, this would be true if no exception was thrown.
      */
@@ -28,7 +30,7 @@ public class ParserResult {
     }
 
     public static ParserResult success() {
-        return new ParserResult().setSuccess(true);
+        return SUCCESS_FLAG;
     }
 
     public static ParserResult success(SQLTemplate template) {
