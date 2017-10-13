@@ -11,6 +11,7 @@ This project can be used to transform our SQL query into a normal elasticsearch 
 
 ## Architecture
 
+* **elasticsearch-common** - Common module
 * **elasticsearch-sql** - Parse elasticsearch SQL dialect into elasticsearch query model.
 * **elasticsearch-driver** - Wrap elasticsearch-sql into a jdbc driver.
 
