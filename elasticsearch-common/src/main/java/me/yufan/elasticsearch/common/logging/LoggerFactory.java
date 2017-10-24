@@ -17,9 +17,9 @@ public class LoggerFactory {
     /**
      * Marker to be used by logging implementations that support markers
      */
-    public static final String MARKER = "ELASTIC_SEARCH_JDBC";
+    public final String MARKER = "ELASTIC_SEARCH_JDBC";
 
-    private static Constructor<? extends Logger> logConstructor;
+    private Constructor<? extends Logger> logConstructor;
 
     static {
         // Tweak the log order for default logger implement
@@ -31,11 +31,11 @@ public class LoggerFactory {
         tryImplementation(LoggerFactory::useSlf4jLogging);
     }
 
-    public static Logger getLog(Class<?> aClass) {
+    public Logger getLog(Class<?> aClass) {
         return getLog(aClass.getName());
     }
 
-    public static Logger getLog(String logger) {
+    public Logger getLog(String logger) {
         try {
             return logConstructor.newInstance(logger);
         } catch (Throwable t) { // NOSONAR Known issues, but it's required to catch Throwable
@@ -43,39 +43,39 @@ public class LoggerFactory {
         }
     }
 
-    public static synchronized void useCustomLogging(Class<? extends Logger> clazz) {
+    public synchronized void useCustomLogging(Class<? extends Logger> clazz) {
         setImplementation(clazz);
     }
 
-    public static synchronized void useSlf4jLogging() {
+    public synchronized void useSlf4jLogging() {
         setImplementation(Slf4jImpl.class);
     }
 
-    public static synchronized void useCommonsLogging() {
+    public synchronized void useCommonsLogging() {
         setImplementation(JakartaCommonsLoggingImpl.class);
     }
 
-    public static synchronized void useLog4JLogging() {
+    public synchronized void useLog4JLogging() {
         setImplementation(Log4jImpl.class);
     }
 
-    public static synchronized void useLog4J2Logging() {
+    public synchronized void useLog4J2Logging() {
         setImplementation(Log4j2Impl.class);
     }
 
-    public static synchronized void useJdkLogging() {
+    public synchronized void useJdkLogging() {
         setImplementation(Jdk14LoggingImpl.class);
     }
 
-    public static synchronized void useStdOutLogging() {
+    public synchronized void useStdOutLogging() {
         setImplementation(StdOutImpl.class);
     }
 
-    public static synchronized void useNoLogging() {
+    public synchronized void useNoLogging() {
         setImplementation(NoLoggingImpl.class);
     }
 
-    private static void tryImplementation(Runnable runnable) {
+    private void tryImplementation(Runnable runnable) {
         if (logConstructor == null) {
             try {
                 runnable.run();
@@ -85,7 +85,7 @@ public class LoggerFactory {
         }
     }
 
-    private static void setImplementation(Class<? extends Logger> implClass) {
+    private void setImplementation(Class<? extends Logger> implClass) {
         try {
             Constructor<? extends Logger> candidate = implClass.getConstructor(String.class);
             Logger log = candidate.newInstance(LoggerFactory.class.getName());
