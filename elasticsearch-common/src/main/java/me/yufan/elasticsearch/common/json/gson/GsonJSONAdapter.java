@@ -1,5 +1,7 @@
 package me.yufan.elasticsearch.common.json.gson;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import me.yufan.elasticsearch.common.json.JSONAdapter;
 import me.yufan.elasticsearch.common.json.JSONArray;
 import me.yufan.elasticsearch.common.json.JSONObject;
@@ -10,68 +12,76 @@ import java.util.Map;
 
 public class GsonJSONAdapter implements JSONAdapter {
 
+    private static final Gson gson = new Gson();
+
     @Override
     public String getName() {
-        return null;
+        return "gson";
     }
 
     @Override
     public <T> T parse(String json, Type type) {
-        return null;
+        return gson.fromJson(json, type);
     }
 
     @Override
     public String toJSONString(Object obj) {
-        return null;
+        return gson.toJson(obj);
     }
 
     @Override
     public JSONObject toJSONObject(Object obj) {
-        return null;
+        String json = gson.toJson(obj);
+        return new GsonJSONObject(gson.fromJson(json, new TypeToken<Map<String, Object>>() {
+        }.getType()));
     }
 
     @Override
     public JSONArray toJSONArray(Object obj) {
-        return null;
+        String json = gson.toJson(obj);
+        return new GsonJSONArray(gson.fromJson(json, new TypeToken<List<Object>>() {
+        }.getType()));
     }
 
     @Override
     public JSONArray parseArray(String json) {
-        return null;
+        return new GsonJSONArray(gson.fromJson(json, new TypeToken<List<Object>>() {
+        }.getType()));
     }
 
     @Override
     public JSONObject parseObject(String json) {
-        return null;
+        return new GsonJSONObject(gson.fromJson(json, new TypeToken<Map<String, Object>>() {
+        }.getType()));
     }
 
     @Override
     public JSONObject newJSONObject() {
-        return null;
+        return new GsonJSONObject();
     }
 
     @Override
     public JSONObject newJSONObject(Map<String, Object> map) {
-        return null;
+        return new GsonJSONObject(map);
     }
 
     @Override
     public JSONObject newJSONObject(int initialCapacity) {
-        return null;
+        return new GsonJSONObject(initialCapacity);
     }
 
     @Override
     public JSONArray newJSONArray() {
-        return null;
+        return new GsonJSONArray();
     }
 
     @Override
     public JSONArray newJSONArray(List<Object> list) {
-        return null;
+        return new GsonJSONArray(list);
     }
 
     @Override
     public JSONArray newJSONArray(int initialCapacity) {
-        return null;
+        return new GsonJSONArray(initialCapacity);
     }
 }

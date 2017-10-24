@@ -51,16 +51,17 @@ public class JSONFactory {
     }
 
     private void setImplementation(Supplier<JSONAdapter> supplier) {
-        if (jsonAdapter == null) {
-            try {
-                jsonAdapter = supplier.get();
+        try {
+            JSONAdapter adapter = supplier.get();
+            if (adapter != null) {
+                jsonAdapter = adapter;
                 if (log.isDebugEnabled()) {
-                    log.debug("JSON initialized using '" + jsonAdapter.getName() + "' adapter.");
+                    log.debug("JSON initialized using '" + JSONFactory.jsonAdapter.getName() + "' adapter.");
                 }
-            } catch (Throwable t) { // NOSONAR Known issues, but it's required to catch Throwable
-                // ignore
-                throw new JSONException("Error setting JSON implementation.  Cause: " + t, t);
             }
+        } catch (Throwable t) { // NOSONAR Known issues, but it's required to catch Throwable
+            // ignore
+            throw new JSONException("Error setting JSON implementation.  Cause: " + t, t);
         }
     }
 
