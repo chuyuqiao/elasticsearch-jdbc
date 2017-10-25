@@ -15,6 +15,6 @@ public class CollectionUtils {
     }
 
     public boolean isEmpty(Collection collection) {
-        return isNotEmpty(collection);
+        return !isNotEmpty(collection);
     }
 }

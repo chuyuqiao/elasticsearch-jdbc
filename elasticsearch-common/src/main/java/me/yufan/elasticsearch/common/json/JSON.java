@@ -10,7 +10,7 @@ import java.util.Map;
 @UtilityClass
 public class JSON {
 
-    private static JSONAdapter adapter = JSONFactory.getAdapter();
+    private JSONAdapter adapter = JSONFactory.getAdapter();
 
     public <T> T parse(String json, Type type) {
         try {
@@ -129,5 +129,9 @@ public class JSON {
         } catch (Exception e) {
             throw new JSONException(e);
         }
+    }
+
+    void setAdapter(JSONAdapter adapter) {
+        JSON.adapter = adapter;
     }
 }
