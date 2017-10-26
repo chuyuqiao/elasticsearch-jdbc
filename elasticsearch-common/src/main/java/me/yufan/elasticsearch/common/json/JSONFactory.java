@@ -55,6 +55,7 @@ public class JSONFactory {
             JSONAdapter adapter = supplier.get();
             if (adapter != null) {
                 jsonAdapter = adapter;
+                JSON.setAdapter(jsonAdapter);
                 if (log.isDebugEnabled()) {
                     log.debug("JSON initialized using '" + JSONFactory.jsonAdapter.getName() + "' adapter.");
                 }
